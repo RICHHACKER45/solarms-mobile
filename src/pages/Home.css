@@ -1,0 +1,87 @@
+ion-content {
+  --background: radial-gradient(circle at top right, #382402 0%, #1a1a2e 40%, #0f0f1a 100%);
+}
+
+.dashboard-header {
+  --background: transparent;
+  padding: 10px;
+}
+
+.header-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-title ion-icon {
+  color: #f39c12;
+  font-size: 2rem;
+  text-shadow: 0 0 15px rgba(243, 156, 18, 0.5);
+}
+
+.metric-card {
+  --background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  text-align: center;
+  padding: 20px 10px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.metric-card ion-icon {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+}
+
+.metric-card.voltage ion-icon { color: #f1c40f; }
+.metric-card.current ion-icon { color: #3498db; }
+.metric-card.power ion-icon { color: #e74c3c; }
+.metric-card.status ion-icon { color: #2ecc71; }
+
+.metric-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin: 5px 0;
+  color: #fff;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.chart-card {
+  --background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.chart-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+.controls-card {
+  --background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  margin-top: 20px;
+  padding-bottom: 10px;
+}
+
+.controls-card ion-item {
+  --background: transparent;
+  --color: #fff;
+}
