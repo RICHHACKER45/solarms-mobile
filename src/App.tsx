@@ -10,14 +10,16 @@ import {
   setupIonicReact
 } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { home, time, cog } from 'ionicons/icons';
+import { home, time, cog, wifi } from 'ionicons/icons';
 
 import Dashboard from './pages/Dashboard';
 import History from './pages/History';
 import Settings from './pages/Settings';
+import Connection from './pages/Connection';
 import AnimatedSplash from './components/AnimatedSplash';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { HardwareProvider } from './contexts/HardwareContext';
+import { LocalNotifications } from '@capacitor/local-notifications';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -47,6 +49,18 @@ const App: React.FC = () => {
     return <AnimatedSplash onAnimationComplete={() => setShowSplash(false)} />;
   }
 
+  useEffect(() => {
+    // Request permissions programmatically so the OS actually shows the popup!
+    const requestPermissions = async () => {
+      try {
+        await LocalNotifications.requestPermissions();
+      } catch (e) {
+        console.warn('Could not request notification permissions', e);
+      }
+    };
+    requestPermissions();
+  }, []);
+
   return (
     <HardwareProvider>
       <IonApp>
@@ -59,6 +73,9 @@ const App: React.FC = () => {
           <Route exact path="/history">
             <History />
           </Route>
+          <Route exact path="/connection">
+            <Connection />
+          </Route>
           <Route path="/settings">
             <Settings />
           </Route>
@@ -67,14 +84,18 @@ const App: React.FC = () => {
           </Route>
         </IonRouterOutlet>
         
-        <IonTabBar slot="bottom" style={{ '--background': 'rgba(255, 255, 255, 0.05)', 'backdropFilter': 'blur(15px)', 'borderTop': '1px solid rgba(255,255,255,0.1)' }}>
+        <IonTabBar slot="bottom" className="custom-tab-bar" style={{ '--background': 'rgba(255, 255, 255, 0.05)', 'backdropFilter': 'blur(15px)', 'borderTop': '1px solid rgba(255,255,255,0.1)' }}>
           <IonTabButton tab="dashboard" href="/dashboard">
             <IonIcon aria-hidden="true" icon={home} />
             <IonLabel>Dashboard</IonLabel>
           </IonTabButton>
           <IonTabButton tab="history" href="/history">
             <IonIcon aria-hidden="true" icon={time} />
-            <IonLabel>History</IonLabel>
+            <IonLabel>Logs</IonLabel>
+          </IonTabButton>
+          <IonTabButton tab="connection" href="/connection">
+            <IonIcon aria-hidden="true" icon={wifi} />
+            <IonLabel>Connect</IonLabel>
           </IonTabButton>
           <IonTabButton tab="settings" href="/settings">
             <IonIcon aria-hidden="true" icon={cog} />

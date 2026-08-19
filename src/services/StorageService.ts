@@ -57,4 +57,32 @@ export class StorageService {
       encoding: Encoding.UTF8,
     });
   }
+  /**
+   * Reads the CSV file and parses it into an array of objects for the UI.
+   */
+  static async getParsedLogs(): Promise<Array<{timestamp: string, voltage: string, current: string, power: string, temp: string}>> {
+    try {
+      const contents = await this.readLogFile();
+      const lines = contents.trim().split('\n');
+      if (lines.length <= 1) return []; // Only header or empty
+      
+      const parsed = [];
+      // Skip the first line (header)
+      for (let i = 1; i < lines.length; i++) {
+        const parts = lines[i].split(',');
+        if (parts.length === 5) {
+          parsed.push({
+            timestamp: parts[0],
+            voltage: parts[1],
+            current: parts[2],
+            power: parts[3],
+            temp: parts[4]
+          });
+        }
+      }
+      return parsed.reverse(); // Newest first
+    } catch (e) {
+      return [];
+    }
+  }
 }

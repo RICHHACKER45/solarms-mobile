@@ -8,7 +8,7 @@ import { useHardware } from '../contexts/HardwareContext';
 import './Home.css';
 
 const Dashboard: React.FC = () => {
-  const { data } = useHardware();
+  const { data, ipAddress, isSimulatorEnabled } = useHardware();
 
   const [controls, setControls] = useState({
     systemLoad: true,
@@ -21,11 +21,50 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     if (data) {
       const timeString = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      // Keep only the last 10 points for the live chart
-      setChartLabels(prev => [...prev.slice(-9), timeString]);
-      setChartDataPoints(prev => [...prev.slice(-9), data.metrics.power_w]);
+      
+      setChartLabels(prev => {
+        const newArr = [...prev, timeString];
+        if (newArr.length > 8) newArr.shift(); // Keep only 8 points so it walks smoothly
+        return newArr;
+      });
+      
+      setChartDataPoints(prev => {
+        const newArr = [...prev, data.metrics.power_w];
+        if (newArr.length > 8) newArr.shift();
+        return newArr;
+      });
     }
   }, [data]);
+
+  const handleSystemLoadChange = async (checked: boolean) => {
+    setControls(prev => ({ ...prev, systemLoad: checked }));
+    if (!isSimulatorEnabled && ipAddress) {
+      try {
+        await fetch(`http://${ipAddress}/control`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ system_load: checked })
+        });
+      } catch (e) {
+        console.warn('Failed to send control to ESP32', e);
+      }
+    }
+  };
+
+  const handleMaintenanceModeChange = async (checked: boolean) => {
+    setControls(prev => ({ ...prev, maintenanceMode: checked }));
+    if (!isSimulatorEnabled && ipAddress) {
+      try {
+        await fetch(`http://${ipAddress}/control`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ maintenance_mode: checked })
+        });
+      } catch (e) {
+        console.warn('Failed to send control to ESP32', e);
+      }
+    }
+  };
 
   const voltage = data?.metrics.voltage_v ?? 0;
   const current = data?.metrics.current_a ?? 0;
@@ -90,8 +129,8 @@ const Dashboard: React.FC = () => {
           <QuickControls 
             systemLoad={controls.systemLoad}
             maintenanceMode={controls.maintenanceMode}
-            onSystemLoadChange={(v) => setControls({...controls, systemLoad: v})}
-            onMaintenanceModeChange={(v) => setControls({...controls, maintenanceMode: v})}
+            onSystemLoadChange={handleSystemLoadChange}
+            onMaintenanceModeChange={handleMaintenanceModeChange}
           />
         </div>
       </IonContent>
