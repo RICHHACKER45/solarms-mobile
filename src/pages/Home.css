@@ -1,87 +1,160 @@
+/* Global Typography Enforcement */
+:root {
+  --ion-font-family: 'Inter', 'Roboto', 'Helvetica Neue', sans-serif;
+}
+
+body {
+  font-family: var(--ion-font-family);
+}
+
 ion-content {
   --background: radial-gradient(circle at top right, #382402 0%, #1a1a2e 40%, #0f0f1a 100%);
 }
 
 .dashboard-header {
-  --background: transparent;
-  padding: 10px;
+  --background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  padding: 5px 10px;
 }
 
 .header-title {
-  font-size: 1.8rem;
-  font-weight: bold;
+  font-size: 1.6rem;
+  font-weight: 800;
   color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.header-title::part(native) {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-.header-title ion-icon {
+.header-title > ion-icon {
   color: #f39c12;
-  font-size: 2rem;
-  text-shadow: 0 0 15px rgba(243, 156, 18, 0.5);
-}
-
-.metric-card {
-  --background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  text-align: center;
-  padding: 20px 10px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-}
-
-.metric-card ion-icon {
-  font-size: 2.5rem;
-  margin-bottom: 10px;
-}
-
-.metric-card.voltage ion-icon { color: #f1c40f; }
-.metric-card.current ion-icon { color: #3498db; }
-.metric-card.power ion-icon { color: #e74c3c; }
-.metric-card.status ion-icon { color: #2ecc71; }
-
-.metric-value {
   font-size: 1.8rem;
-  font-weight: bold;
-  margin: 5px 0;
-  color: #fff;
+  text-shadow: 0 0 15px rgba(243, 156, 18, 0.6);
+  vertical-align: middle;
+  margin-right: 8px;
+  transform: translateY(-2px);
 }
 
-.metric-label {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
-  text-transform: uppercase;
-  letter-spacing: 1px;
+/* Glassmorphism Cards */
+.glass-card {
+  --background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  margin-bottom: 16px;
 }
 
-.chart-card {
-  --background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 20px;
-  margin-top: 20px;
+/* Metric Cards */
+.metric-card {
+  margin: 4px 0;
+  text-align: center;
+  padding-top: 5px;
 }
 
-.chart-title {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #fff;
-  margin-bottom: 15px;
-}
-
-.controls-card {
-  --background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  margin-top: 20px;
+.metric-card ion-card-header {
   padding-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.controls-card ion-item {
+/* Premium Icon Circles */
+.metric-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.metric-icon-container ion-icon {
+  font-size: 1.6rem;
+}
+
+.metric-card.voltage .metric-icon-container { color: #f1c40f; background: rgba(241, 196, 15, 0.15); box-shadow: 0 4px 15px rgba(241, 196, 15, 0.2); }
+.metric-card.current .metric-icon-container { color: #3498db; background: rgba(52, 152, 219, 0.15); box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2); }
+.metric-card.power .metric-icon-container { color: #e74c3c; background: rgba(231, 76, 60, 0.15); box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2); }
+.metric-card.status .metric-icon-container { color: #2ecc71; background: rgba(46, 204, 113, 0.15); box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2); }
+
+.metric-card ion-card-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.metric-card ion-card-subtitle {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 5px;
+}
+
+/* Chart Title */
+.chart-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+  padding: 15px 15px 5px 15px;
+}
+
+/* Inset Lists for Controls & Settings */
+ion-list.ios.glass-list,
+ion-list.md.glass-list {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  margin-bottom: 24px;
+}
+
+ion-list.ios.settings-list,
+ion-list.md.settings-list {
+  margin-top: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  margin-bottom: 24px !important;
+}
+
+/* Remove default item lines for cleaner look */
+ion-item {
   --background: transparent;
+  --color: #ffffff;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --padding-bottom: 8px;
+}
+
+/* Settings Rectangular Inputs */
+.custom-input {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 12px 16px !important;
+  margin-top: 8px !important;
   --color: #fff;
+  font-weight: 500;
+  width: 100%;
+}
+.custom-input.ion-focused {
+  border-color: #f39c12;
+  box-shadow: 0 0 0 2px rgba(243, 156, 18, 0.2);
+}
+
+/* Buttons */
+.settings-button {
+  margin: 16px 16px 24px 16px;
+  --border-radius: 12px;
+  font-weight: bold;
 }
