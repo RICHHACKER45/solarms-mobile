@@ -1,26 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonIcon } from '@ionic/react';
 import { sunny, flash, flashOff, power, checkmarkCircle } from 'ionicons/icons';
 import MetricCard from '../components/MetricCard';
 import PowerChart from '../components/PowerChart';
 import QuickControls from '../components/QuickControls';
+import { useHardware } from '../contexts/HardwareContext';
 import './Home.css';
 
 const Dashboard: React.FC = () => {
-  const [sensorData] = useState({
-    voltage: 12.5,
-    current: 2.1,
-    power: 26.25,
-    status: 'Normal'
-  });
+  const { data } = useHardware();
 
   const [controls, setControls] = useState({
     systemLoad: true,
     maintenanceMode: false
   });
 
-  const chartLabels = ['10:00', '10:05', '10:10', '10:15', '10:20', '10:25', '10:30'];
-  const chartDataPoints = [15, 20, 22, 26, 25, 26.25, 26.25];
+  const [chartLabels, setChartLabels] = useState<string[]>([]);
+  const [chartDataPoints, setChartDataPoints] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (data) {
+      const timeString = new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      // Keep only the last 10 points for the live chart
+      setChartLabels(prev => [...prev.slice(-9), timeString]);
+      setChartDataPoints(prev => [...prev.slice(-9), data.metrics.power_w]);
+    }
+  }, [data]);
+
+  const voltage = data?.metrics.voltage_v ?? 0;
+  const current = data?.metrics.current_a ?? 0;
+  const powerVal = data?.metrics.power_w ?? 0;
+  const status = data?.status === 'online' ? 'Normal' : 'Offline';
 
   return (
     <IonPage>
@@ -39,7 +49,7 @@ const Dashboard: React.FC = () => {
               <IonCol size="6">
                 <MetricCard 
                   title="Panel Voltage" 
-                  value={sensorData.voltage} 
+                  value={voltage} 
                   unit="V" 
                   icon={flash} 
                   colorClass="voltage" 
@@ -48,7 +58,7 @@ const Dashboard: React.FC = () => {
               <IonCol size="6">
                 <MetricCard 
                   title="Current" 
-                  value={sensorData.current} 
+                  value={current} 
                   unit="A" 
                   icon={flashOff} 
                   colorClass="current" 
@@ -57,7 +67,7 @@ const Dashboard: React.FC = () => {
               <IonCol size="6">
                 <MetricCard 
                   title="Power Output" 
-                  value={sensorData.power} 
+                  value={powerVal} 
                   unit="W" 
                   icon={power} 
                   colorClass="power" 
@@ -66,7 +76,7 @@ const Dashboard: React.FC = () => {
               <IonCol size="6">
                 <MetricCard 
                   title="System Status" 
-                  value={sensorData.status} 
+                  value={status as any} 
                   unit="" 
                   icon={checkmarkCircle} 
                   colorClass="status" 

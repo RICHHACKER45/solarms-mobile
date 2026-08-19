@@ -2,14 +2,16 @@ import React, { useState } from 'react';
 import { 
   IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, 
   IonList, IonItem, IonLabel, IonInput, IonSelect, IonSelectOption, 
-  IonButton, IonListHeader, useIonToast, useIonAlert
+  IonButton, IonListHeader, useIonToast, useIonAlert, IonToggle
 } from '@ionic/react';
-import { cog, chatbubbleOutline, lockClosedOutline, personAddOutline, warningOutline } from 'ionicons/icons';
+import { cog, chatbubbleOutline, lockClosedOutline, personAddOutline, warningOutline, wifiOutline, constructOutline, alertCircleOutline } from 'ionicons/icons';
+import { useHardware } from '../contexts/HardwareContext';
 import './Home.css';
 
 const Settings: React.FC = () => {
   const [presentToast] = useIonToast();
   const [presentAlert] = useIonAlert();
+  const { ipAddress, setIpAddress, isSimulatorEnabled, setSimulatorEnabled, triggerFakeSpike } = useHardware();
   
   // States based on db.php settings
   const [settings, setSettings] = useState({
@@ -69,6 +71,57 @@ const Settings: React.FC = () => {
       <IonContent fullscreen>
         <div className="ion-padding" style={{ paddingBottom: '40px' }}>
           
+          {/* Connection Manager */}
+          <IonList inset={true} className="glass-list settings-list">
+            <IonListHeader style={{ paddingBottom: '10px' }}>
+              <IonIcon icon={wifiOutline} style={{ marginRight: '8px', color: '#f39c12' }} />
+              <IonLabel style={{ color: '#fff', fontSize: '1.2rem', fontWeight: 'bold' }}>Hardware Connection</IonLabel>
+            </IonListHeader>
+            <IonItem lines="none" style={{ flexDirection: 'column', alignItems: 'flex-start', paddingBottom: '16px' }}>
+              <IonLabel style={{ marginBottom: '8px', fontSize: '0.9rem', opacity: 0.8 }}>Hardware IP Address</IonLabel>
+              <IonInput 
+                className="custom-input"
+                type="text"
+                placeholder="192.168.4.1"
+                value={ipAddress} 
+                onIonChange={e => setIpAddress(e.detail.value!)}
+              />
+            </IonItem>
+          </IonList>
+
+          {/* Developer Options */}
+          <IonList inset={true} className="glass-list settings-list" style={{ border: '1px solid rgba(56, 189, 248, 0.3)' }}>
+            <IonListHeader style={{ paddingBottom: '10px' }}>
+              <IonIcon icon={constructOutline} style={{ marginRight: '8px', color: '#38bdf8' }} />
+              <IonLabel style={{ color: '#38bdf8', fontSize: '1.2rem', fontWeight: 'bold' }}>Developer Options</IonLabel>
+            </IonListHeader>
+            <IonItem lines="none" style={{ paddingBottom: '8px' }}>
+              <IonLabel style={{ fontSize: '0.95rem' }}>Mock Data Simulator</IonLabel>
+              <IonToggle 
+                checked={isSimulatorEnabled} 
+                onIonChange={e => setSimulatorEnabled(e.detail.checked)}
+                color="secondary"
+              />
+            </IonItem>
+            {isSimulatorEnabled && (
+              <IonItem lines="none" style={{ paddingTop: '8px', paddingBottom: '16px' }}>
+                <IonButton 
+                  fill="outline" 
+                  expand="block" 
+                  color="warning" 
+                  onClick={() => {
+                    triggerFakeSpike();
+                    presentToast({ message: 'Fake voltage spike triggered!', duration: 2000, color: 'warning' });
+                  }}
+                  style={{ width: '100%' }}
+                >
+                  <IonIcon icon={alertCircleOutline} slot="start" />
+                  Test Voltage Spike
+                </IonButton>
+              </IonItem>
+            )}
+          </IonList>
+
           {/* 1. Notification Settings */}
           <IonList inset={true} className="glass-list settings-list">
             <IonListHeader style={{ paddingBottom: '10px' }}>

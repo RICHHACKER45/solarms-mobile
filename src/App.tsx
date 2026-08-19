@@ -17,6 +17,7 @@ import History from './pages/History';
 import Settings from './pages/Settings';
 import AnimatedSplash from './components/AnimatedSplash';
 import { useState } from 'react';
+import { HardwareProvider } from './contexts/HardwareContext';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -47,9 +48,10 @@ const App: React.FC = () => {
   }
 
   return (
-    <IonApp>
-      <IonReactRouter>
-        <IonTabs>
+    <HardwareProvider>
+      <IonApp>
+        <IonReactRouter>
+          <IonTabs>
         <IonRouterOutlet>
           <Route exact path="/dashboard">
             <Dashboard />
@@ -78,10 +80,11 @@ const App: React.FC = () => {
             <IonIcon aria-hidden="true" icon={cog} />
             <IonLabel>Settings</IonLabel>
           </IonTabButton>
-        </IonTabBar>
-      </IonTabs>
-    </IonReactRouter>
-  </IonApp>
+          </IonTabBar>
+        </IonTabs>
+      </IonReactRouter>
+    </IonApp>
+    </HardwareProvider>
   );
 };
 
