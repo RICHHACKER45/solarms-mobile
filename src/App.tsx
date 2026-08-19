@@ -15,6 +15,8 @@ import { home, time, cog } from 'ionicons/icons';
 import Dashboard from './pages/Dashboard';
 import History from './pages/History';
 import Settings from './pages/Settings';
+import AnimatedSplash from './components/AnimatedSplash';
+import { useState } from 'react';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -37,10 +39,17 @@ import './theme/variables.css';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <IonTabs>
+const App: React.FC = () => {
+  const [showSplash, setShowSplash] = useState(true);
+
+  if (showSplash) {
+    return <AnimatedSplash onAnimationComplete={() => setShowSplash(false)} />;
+  }
+
+  return (
+    <IonApp>
+      <IonReactRouter>
+        <IonTabs>
         <IonRouterOutlet>
           <Route exact path="/dashboard">
             <Dashboard />
@@ -73,6 +82,7 @@ const App: React.FC = () => (
       </IonTabs>
     </IonReactRouter>
   </IonApp>
-);
+  );
+};
 
 export default App;
