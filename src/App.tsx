@@ -45,10 +45,6 @@ setupIonicReact();
 const App: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
 
-  if (showSplash) {
-    return <AnimatedSplash onAnimationComplete={() => setShowSplash(false)} />;
-  }
-
   useEffect(() => {
     // Request permissions programmatically so the OS actually shows the popup!
     const requestPermissions = async () => {
@@ -60,6 +56,10 @@ const App: React.FC = () => {
     };
     requestPermissions();
   }, []);
+
+  if (showSplash) {
+    return <AnimatedSplash onAnimationComplete={() => setShowSplash(false)} />;
+  }
 
   return (
     <HardwareProvider>
