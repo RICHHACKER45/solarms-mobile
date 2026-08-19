@@ -20,6 +20,7 @@ const Settings: React.FC = () => {
   });
 
   const [pinForm, setPinForm] = useState('');
+  const [hasPin, setHasPin] = useState(false);
 
   // Load saved settings on boot
   useEffect(() => {
@@ -31,6 +32,11 @@ const Settings: React.FC = () => {
         adminPhone: savedPhone.value || '+639123456789',
         voltageThreshold: savedThreshold.value || '11.0'
       });
+
+      const savedPin = await Preferences.get({ key: 'app_pin' });
+      if (savedPin.value) {
+        setHasPin(true);
+      }
     };
     loadSettings();
   }, []);
@@ -42,13 +48,20 @@ const Settings: React.FC = () => {
   };
 
   const handleUpdatePin = async () => {
-    if (pinForm.length < 4) {
-      presentToast({ message: 'PIN must be at least 4 digits.', duration: 2000, color: 'danger' });
+    if (pinForm.length !== 6) {
+      presentToast({ message: 'PIN must be exactly 6 digits.', duration: 2000, color: 'danger' });
       return;
     }
     await Preferences.set({ key: 'app_pin', value: pinForm });
     presentToast({ message: 'Security PIN successfully updated!', duration: 2000, color: 'success' });
     setPinForm('');
+    setHasPin(true);
+  };
+
+  const handleRemovePin = async () => {
+    await Preferences.remove({ key: 'app_pin' });
+    presentToast({ message: 'Security PIN has been removed.', duration: 2000, color: 'warning' });
+    setHasPin(false);
   };
 
   const confirmFactoryReset = () => {
@@ -162,17 +175,22 @@ const Settings: React.FC = () => {
                 fill="outline"
                 type="password"
                 inputMode="numeric"
-                placeholder="4-digit PIN"
+                placeholder="6-digit PIN"
                 value={pinForm} 
                 onIonInput={(e: any) => setPinForm(e.target.value)}
-                maxlength={4}
+                maxlength={6}
                 style={{ '--background': 'rgba(255,255,255,0.06)', '--color': '#fff', width: '90%', margin: '0 auto' }}
               />
             </div>
             <IonButton expand="block" color="medium" onClick={handleUpdatePin} style={{ margin: '0 16px 16px', '--border-radius': '8px' }}>
               <IonIcon slot="start" icon={keyOutline} />
-              Set PIN
+              {hasPin ? 'Change PIN' : 'Set PIN'}
             </IonButton>
+            {hasPin && (
+              <IonButton expand="block" color="danger" fill="clear" onClick={handleRemovePin} style={{ margin: '0 16px 16px' }}>
+                Remove Current PIN
+              </IonButton>
+            )}
           </IonList>
 
           {/* 3. Factory Reset */}

@@ -17,10 +17,12 @@ import History from './pages/History';
 import Settings from './pages/Settings';
 import Connection from './pages/Connection';
 import AnimatedSplash from './components/AnimatedSplash';
+import LockScreen from './components/LockScreen';
 import { useState, useEffect } from 'react';
 import { HardwareProvider } from './contexts/HardwareContext';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { Filesystem } from '@capacitor/filesystem';
+import { Preferences } from '@capacitor/preferences';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -45,6 +47,8 @@ setupIonicReact();
 
 const App: React.FC = () => {
   const [showSplash, setShowSplash] = useState(true);
+  const [isLocked, setIsLocked] = useState(false);
+  const [correctPin, setCorrectPin] = useState('');
 
   useEffect(() => {
     // Request permissions programmatically so the OS actually shows the popup!
@@ -56,11 +60,25 @@ const App: React.FC = () => {
         console.warn('Could not request permissions', e);
       }
     };
+
+    const checkSecurity = async () => {
+      const pin = await Preferences.get({ key: 'app_pin' });
+      if (pin.value && pin.value.length === 6) {
+        setCorrectPin(pin.value);
+        setIsLocked(true);
+      }
+    };
+
     requestPermissions();
+    checkSecurity();
   }, []);
 
   if (showSplash) {
     return <AnimatedSplash onAnimationComplete={() => setShowSplash(false)} />;
+  }
+
+  if (isLocked) {
+    return <LockScreen correctPin={correctPin} onUnlock={() => setIsLocked(false)} />;
   }
 
   return (
