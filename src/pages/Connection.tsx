@@ -53,23 +53,20 @@ const Connection: React.FC = () => {
           </p>
 
           <div className="glass-card" style={{ width: '100%', padding: '20px', borderRadius: '16px' }}>
-            <IonItem lines="none" style={{ '--background': 'transparent', paddingBottom: '10px' }}>
-              <IonLabel position="stacked" style={{ color: '#f39c12', fontWeight: 'bold', marginBottom: '8px' }}>ESP32 IP Address</IonLabel>
-              <IonInput 
-                className="custom-input"
-                type="text" 
-                placeholder="e.g. 192.168.4.1" 
-                value={tempIp}
-                onIonChange={(e) => setTempIp(e.detail.value!)}
-                style={{
-                  background: 'rgba(0,0,0,0.5)',
-                  borderRadius: '8px',
-                  padding: '10px',
-                  color: '#fff',
-                  border: '1px solid rgba(255,255,255,0.1)'
-                }}
-              />
-            </IonItem>
+            <IonInput 
+              label="ESP32 IP Address"
+              labelPlacement="stacked"
+              fill="outline"
+              type="text" 
+              placeholder="e.g. 192.168.4.1" 
+              value={tempIp}
+              onIonChange={(e) => setTempIp(e.detail.value!)}
+              style={{
+                '--background': 'rgba(0,0,0,0.5)',
+                '--color': '#fff',
+                marginBottom: '10px'
+              }}
+            />
 
             <IonButton expand="block" color="primary" onClick={handleSave} style={{ marginTop: '16px', '--border-radius': '8px' }}>
               <IonIcon slot="start" icon={saveOutline} />

@@ -75,7 +75,7 @@ const History: React.FC = () => {
         </IonList>
         
         <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem', textAlign: 'center', marginTop: '16px', paddingBottom: '20px' }}>
-          Saved as <strong>solarms_history.csv</strong> in Documents.
+          Saved as <strong>solarms_history.csv</strong> in local app storage.
         </p>
       </IonContent>
     </IonPage>

@@ -5,7 +5,7 @@ export class StorageService {
   private static fileName = 'solarms_history.csv';
 
   /**
-   * Appends a new hardware reading to the physical CSV file in the Android Documents folder.
+   * Appends a new hardware reading to the physical CSV file in the Android Data folder.
    */
   static async logData(data: HardwareData) {
     const csvLine = `${new Date(data.timestamp).toLocaleString()},${data.metrics.voltage_v},${data.metrics.current_a},${data.metrics.power_w},${data.metrics.temperature_c}\n`;
@@ -14,7 +14,7 @@ export class StorageService {
       await Filesystem.appendFile({
         path: this.fileName,
         data: csvLine,
-        directory: Directory.Documents,
+        directory: Directory.Data,
         encoding: Encoding.UTF8,
       });
     } catch (e) {
@@ -23,7 +23,7 @@ export class StorageService {
       await Filesystem.writeFile({
         path: this.fileName,
         data: header + csvLine,
-        directory: Directory.Documents,
+        directory: Directory.Data,
         encoding: Encoding.UTF8,
       });
     }
@@ -36,7 +36,7 @@ export class StorageService {
     try {
       const contents = await Filesystem.readFile({
         path: this.fileName,
-        directory: Directory.Documents,
+        directory: Directory.Data,
         encoding: Encoding.UTF8,
       });
       return contents.data as string;
@@ -53,7 +53,7 @@ export class StorageService {
     await Filesystem.writeFile({
       path: this.fileName,
       data: header,
-      directory: Directory.Documents,
+      directory: Directory.Data,
       encoding: Encoding.UTF8,
     });
   }
