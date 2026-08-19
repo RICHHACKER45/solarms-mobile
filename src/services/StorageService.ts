@@ -8,7 +8,8 @@ export class StorageService {
    * Appends a new hardware reading to the physical CSV file in the Android Data folder.
    */
   static async logData(data: HardwareData) {
-    const csvLine = `${new Date(data.timestamp).toLocaleString()},${data.metrics.voltage_v},${data.metrics.current_a},${data.metrics.power_w},${data.metrics.temperature_c}\n`;
+    const safeTimestamp = new Date(data.timestamp).toLocaleString().replace(',', '');
+    const csvLine = `${safeTimestamp},${data.metrics.voltage_v},${data.metrics.current_a},${data.metrics.power_w},${data.metrics.temperature_c}\n`;
     
     try {
       await Filesystem.appendFile({
@@ -59,24 +60,60 @@ export class StorageService {
   }
   /**
    * Reads the CSV file and parses it into an array of objects for the UI.
+   * Also computes whether each log is 'important' (significant change or warning).
    */
-  static async getParsedLogs(): Promise<Array<{timestamp: string, voltage: string, current: string, power: string, temp: string}>> {
+  static async getParsedLogs(): Promise<Array<{timestamp: string, voltage: string, current: string, power: string, temp: string, isImportant: boolean}>> {
     try {
       const contents = await this.readLogFile();
       const lines = contents.trim().split('\n');
       if (lines.length <= 1) return []; // Only header or empty
       
       const parsed = [];
+      let lastImportantVoltage = -1;
       // Skip the first line (header)
       for (let i = 1; i < lines.length; i++) {
         const parts = lines[i].split(',');
-        if (parts.length === 5) {
+        if (parts.length >= 5) {
+          
+          let timestamp = parts[0];
+          let vStr = parts[1];
+          let cStr = parts[2];
+          let pStr = parts[3];
+          let tStr = parts[4];
+
+          if (parts.length === 6) {
+            // Handle old logs that accidentally had a comma in the timestamp
+            timestamp = parts[0] + ',' + parts[1];
+            vStr = parts[2];
+            cStr = parts[3];
+            pStr = parts[4];
+            tStr = parts[5];
+          }
+
+          const voltage = parseFloat(vStr);
+          const temp = parseFloat(tStr);
+          
+          let isImportant = false;
+          // Rule 1: Out of bounds (Warnings)
+          if (voltage > 14.5 || voltage < 11.5 || temp > 45) {
+            isImportant = true;
+          }
+          // Rule 2: Significant change (e.g. 0.5V jump since last important record)
+          else if (lastImportantVoltage === -1 || Math.abs(voltage - lastImportantVoltage) >= 0.5) {
+            isImportant = true;
+          }
+
+          if (isImportant) {
+            lastImportantVoltage = voltage;
+          }
+
           parsed.push({
-            timestamp: parts[0],
-            voltage: parts[1],
-            current: parts[2],
-            power: parts[3],
-            temp: parts[4]
+            timestamp,
+            voltage: vStr,
+            current: cStr,
+            power: pStr,
+            temp: tStr,
+            isImportant
           });
         }
       }
