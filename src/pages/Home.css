@@ -141,11 +141,14 @@ ion-item {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 8px;
-  padding: 12px 16px !important;
   margin-top: 8px !important;
   --color: #fff;
   font-weight: 500;
   width: 100%;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
 }
 .custom-input.ion-focused {
   border-color: #f39c12;

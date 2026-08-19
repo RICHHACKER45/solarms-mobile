@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonIcon } from '@ionic/react';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonGrid, IonRow, IonCol, IonIcon, useIonAlert } from '@ionic/react';
 import { sunny, flash, flashOff, power, checkmarkCircle } from 'ionicons/icons';
 import MetricCard from '../components/MetricCard';
 import PowerChart from '../components/PowerChart';
 import QuickControls from '../components/QuickControls';
 import { useHardware } from '../contexts/HardwareContext';
+import { Preferences } from '@capacitor/preferences';
 import './Home.css';
 
 const Dashboard: React.FC = () => {
   const { data, ipAddress, isSimulatorEnabled } = useHardware();
+  const [presentAlert] = useIonAlert();
 
   const [controls, setControls] = useState({
     systemLoad: true,
@@ -35,6 +37,21 @@ const Dashboard: React.FC = () => {
       });
     }
   }, [data]);
+
+  useEffect(() => {
+    const checkBatteryNotice = async () => {
+      const { value } = await Preferences.get({ key: 'battery_notice_shown' });
+      if (value !== 'true') {
+        presentAlert({
+          header: 'Background Execution',
+          message: 'To ensure the app receives alerts when closed, please go to your Android Settings -> Apps -> SolarMS -> Battery, and set it to "Unrestricted".',
+          buttons: ['Got it!']
+        });
+        await Preferences.set({ key: 'battery_notice_shown', value: 'true' });
+      }
+    };
+    checkBatteryNotice();
+  }, [presentAlert]);
 
   const handleSystemLoadChange = async (checked: boolean) => {
     setControls(prev => ({ ...prev, systemLoad: checked }));

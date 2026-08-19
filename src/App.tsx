@@ -20,6 +20,7 @@ import AnimatedSplash from './components/AnimatedSplash';
 import { useState, useEffect } from 'react';
 import { HardwareProvider } from './contexts/HardwareContext';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { Filesystem } from '@capacitor/filesystem';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -50,8 +51,9 @@ const App: React.FC = () => {
     const requestPermissions = async () => {
       try {
         await LocalNotifications.requestPermissions();
+        await Filesystem.requestPermissions();
       } catch (e) {
-        console.warn('Could not request notification permissions', e);
+        console.warn('Could not request permissions', e);
       }
     };
     requestPermissions();
