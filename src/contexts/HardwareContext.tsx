@@ -39,6 +39,7 @@ export const HardwareProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [data, setData] = useState<HardwareData | null>(null);
   const [ipAddress, setIpAddressState] = useState<string>('');
   const [isSimulatorEnabled, setSimulatorEnabledState] = useState<boolean>(false);
+  const [lastNotificationTime, setLastNotificationTime] = useState<number>(0);
 
   // Load saved preferences on startup
   useEffect(() => {
@@ -79,18 +80,42 @@ export const HardwareProvider: React.FC<{ children: ReactNode }> = ({ children }
     
     setData(newData);
     StorageService.logData(newData);
-    
-    // Trigger a Local Push Notification
-    await LocalNotifications.schedule({
-      notifications: [
-        {
-          title: '⚠️ CRITICAL: Voltage Spike Detected',
-          body: `Voltage reached ${newData.metrics.voltage_v}V! Immediate action required.`,
-          id: Date.now(),
-          schedule: { at: new Date(Date.now() + 1000) }, // 1 second from now
+    await processNotifications(newData, true); // true = force notification for fake spike
+  };
+
+  const processNotifications = async (hardwareData: HardwareData, force = false) => {
+    // Check if out of bounds
+    if (hardwareData.metrics.voltage_v > 14.5 || hardwareData.metrics.voltage_v < 11.5) {
+      
+      const now = Date.now();
+      // 15-minute cooldown (900000ms) to prevent spamming notifications, unless forced by the manual test button
+      if (!force && (now - lastNotificationTime < 15 * 60 * 1000)) {
+        return; 
+      }
+
+      const localPushReq = await Preferences.get({ key: 'local_push_enabled' });
+      if (localPushReq.value !== 'false') {
+        
+        // Request permissions just in case it wasn't done at boot
+        const permStatus = await LocalNotifications.checkPermissions();
+        if (permStatus.display !== 'granted') {
+          await LocalNotifications.requestPermissions();
         }
-      ]
-    });
+
+        await LocalNotifications.schedule({
+          notifications: [
+            {
+              title: '⚠️ CRITICAL: Voltage Alert',
+              body: `SolarMS Voltage is at ${hardwareData.metrics.voltage_v}V!`,
+              id: Math.floor(Math.random() * 2147483647), // Must be a 32-bit int
+              schedule: { at: new Date(Date.now() + 1000) },
+            }
+          ]
+        });
+
+        setLastNotificationTime(now);
+      }
+    }
   };
 
   // The main engine loop
@@ -127,6 +152,7 @@ export const HardwareProvider: React.FC<{ children: ReactNode }> = ({ children }
         };
         setData(newData);
         StorageService.logData(newData);
+        processNotifications(newData);
       }, 5000); // 5 seconds for simulator log
       
     } else if (ipAddress) {
@@ -141,6 +167,7 @@ export const HardwareProvider: React.FC<{ children: ReactNode }> = ({ children }
             const hardwareData: HardwareData = await response.json();
             setData(hardwareData);
             StorageService.logData(hardwareData);
+            processNotifications(hardwareData);
           }
         } catch (error) {
           // Hardware is unreachable or disconnected

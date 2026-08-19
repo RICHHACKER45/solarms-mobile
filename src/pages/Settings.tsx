@@ -15,8 +15,8 @@ const Settings: React.FC = () => {
   const { isSimulatorEnabled, setSimulatorEnabled, triggerFakeSpike } = useHardware();
   
   const [settings, setSettings] = useState({
-    adminPhone: '',
-    voltageThreshold: '11.0'
+    voltageThreshold: '11.0',
+    localPushEnabled: true
   });
 
   const [pinForm, setPinForm] = useState('');
@@ -25,12 +25,12 @@ const Settings: React.FC = () => {
   // Load saved settings on boot
   useEffect(() => {
     const loadSettings = async () => {
-      const savedPhone = await Preferences.get({ key: 'admin_phone' });
       const savedThreshold = await Preferences.get({ key: 'voltage_threshold' });
+      const savedPush = await Preferences.get({ key: 'local_push_enabled' });
       
       setSettings({
-        adminPhone: savedPhone.value || '+639123456789',
-        voltageThreshold: savedThreshold.value || '11.0'
+        voltageThreshold: savedThreshold.value || '11.0',
+        localPushEnabled: savedPush.value !== 'false'
       });
 
       const savedPin = await Preferences.get({ key: 'app_pin' });
@@ -42,8 +42,8 @@ const Settings: React.FC = () => {
   }, []);
   
   const handleSaveNotification = async () => {
-    await Preferences.set({ key: 'admin_phone', value: settings.adminPhone });
     await Preferences.set({ key: 'voltage_threshold', value: settings.voltageThreshold });
+    await Preferences.set({ key: 'local_push_enabled', value: settings.localPushEnabled ? 'true' : 'false' });
     presentToast({ message: 'Notification settings saved securely!', duration: 2000, color: 'success' });
   };
 
@@ -133,18 +133,15 @@ const Settings: React.FC = () => {
               <IonIcon icon={chatbubbleOutline} style={{ marginRight: '8px', color: '#f39c12' }} />
               <IonLabel style={{ color: '#fff', fontSize: '1.2rem', fontWeight: 'bold' }}>Notification Settings</IonLabel>
             </IonListHeader>
-            <div style={{ marginBottom: '16px' }}>
-              <IonInput 
-                label="Alert Phone Number"
-                labelPlacement="stacked"
-                fill="outline"
-                type="tel"
-                placeholder="+639123456789"
-                value={settings.adminPhone} 
-                onIonInput={(e: any) => setSettings({...settings, adminPhone: e.target.value})}
-                style={{ '--background': 'rgba(255,255,255,0.06)', '--color': '#fff', width: '90%', margin: '0 auto' }}
+
+            <IonItem lines="none" style={{ paddingBottom: '8px', '--background': 'transparent' }}>
+              <IonLabel style={{ fontSize: '0.95rem', color: '#fff' }}>Local Phone Notifications</IonLabel>
+              <IonToggle 
+                checked={settings.localPushEnabled} 
+                onIonChange={e => setSettings({...settings, localPushEnabled: e.detail.checked})}
+                color="success"
               />
-            </div>
+            </IonItem>
             <div style={{ marginBottom: '16px' }}>
               <IonInput 
                 label="Voltage Threshold (Alert when below)"
