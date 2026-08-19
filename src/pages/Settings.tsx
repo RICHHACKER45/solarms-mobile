@@ -15,14 +15,30 @@ const Settings: React.FC = () => {
   const { isSimulatorEnabled, setSimulatorEnabled, triggerFakeSpike } = useHardware();
   
   const [settings, setSettings] = useState({
-    adminPhone: '+639123456789',
+    adminPhone: '',
     voltageThreshold: '11.0'
   });
 
   const [pinForm, setPinForm] = useState('');
+
+  // Load saved settings on boot
+  useEffect(() => {
+    const loadSettings = async () => {
+      const savedPhone = await Preferences.get({ key: 'admin_phone' });
+      const savedThreshold = await Preferences.get({ key: 'voltage_threshold' });
+      
+      setSettings({
+        adminPhone: savedPhone.value || '+639123456789',
+        voltageThreshold: savedThreshold.value || '11.0'
+      });
+    };
+    loadSettings();
+  }, []);
   
-  const handleSaveNotification = () => {
-    presentToast({ message: 'Notification settings updated!', duration: 2000, color: 'success' });
+  const handleSaveNotification = async () => {
+    await Preferences.set({ key: 'admin_phone', value: settings.adminPhone });
+    await Preferences.set({ key: 'voltage_threshold', value: settings.voltageThreshold });
+    presentToast({ message: 'Notification settings saved securely!', duration: 2000, color: 'success' });
   };
 
   const handleUpdatePin = async () => {
@@ -104,7 +120,7 @@ const Settings: React.FC = () => {
               <IonIcon icon={chatbubbleOutline} style={{ marginRight: '8px', color: '#f39c12' }} />
               <IonLabel style={{ color: '#fff', fontSize: '1.2rem', fontWeight: 'bold' }}>Notification Settings</IonLabel>
             </IonListHeader>
-            <IonItem lines="none" style={{ paddingBottom: '16px', '--background': 'transparent' }}>
+            <div style={{ marginBottom: '16px' }}>
               <IonInput 
                 label="Alert Phone Number"
                 labelPlacement="stacked"
@@ -112,11 +128,11 @@ const Settings: React.FC = () => {
                 type="tel"
                 placeholder="+639123456789"
                 value={settings.adminPhone} 
-                onIonChange={e => setSettings({...settings, adminPhone: e.detail.value!})}
-                style={{ '--background': 'rgba(255,255,255,0.06)', '--color': '#fff' }}
+                onIonInput={(e: any) => setSettings({...settings, adminPhone: e.target.value})}
+                style={{ '--background': 'rgba(255,255,255,0.06)', '--color': '#fff', width: '90%', margin: '0 auto' }}
               />
-            </IonItem>
-            <IonItem lines="none" style={{ paddingBottom: '16px', '--background': 'transparent' }}>
+            </div>
+            <div style={{ marginBottom: '16px' }}>
               <IonInput 
                 label="Voltage Threshold (Alert when below)"
                 labelPlacement="stacked"
@@ -124,10 +140,10 @@ const Settings: React.FC = () => {
                 type="number" 
                 step="0.1"
                 value={settings.voltageThreshold} 
-                onIonChange={e => setSettings({...settings, voltageThreshold: e.detail.value!})}
-                style={{ '--background': 'rgba(255,255,255,0.06)', '--color': '#fff' }}
+                onIonInput={(e: any) => setSettings({...settings, voltageThreshold: e.target.value})}
+                style={{ '--background': 'rgba(255,255,255,0.06)', '--color': '#fff', width: '90%', margin: '0 auto' }}
               />
-            </IonItem>
+            </div>
             <IonButton expand="block" color="primary" onClick={handleSaveNotification} style={{ margin: '0 16px 16px', '--border-radius': '8px' }}>
               Save Changes
             </IonButton>
@@ -139,7 +155,7 @@ const Settings: React.FC = () => {
               <IonIcon icon={lockClosedOutline} style={{ marginRight: '8px', color: '#f39c12' }} />
               <IonLabel style={{ color: '#fff', fontSize: '1.2rem', fontWeight: 'bold' }}>App Security</IonLabel>
             </IonListHeader>
-            <IonItem lines="none" style={{ paddingBottom: '16px', '--background': 'transparent' }}>
+            <div style={{ marginBottom: '16px' }}>
               <IonInput 
                 label="New Security PIN"
                 labelPlacement="stacked"
@@ -148,11 +164,11 @@ const Settings: React.FC = () => {
                 inputMode="numeric"
                 placeholder="4-digit PIN"
                 value={pinForm} 
-                onIonChange={e => setPinForm(e.detail.value!)}
+                onIonInput={(e: any) => setPinForm(e.target.value)}
                 maxlength={4}
-                style={{ '--background': 'rgba(255,255,255,0.06)', '--color': '#fff' }}
+                style={{ '--background': 'rgba(255,255,255,0.06)', '--color': '#fff', width: '90%', margin: '0 auto' }}
               />
-            </IonItem>
+            </div>
             <IonButton expand="block" color="medium" onClick={handleUpdatePin} style={{ margin: '0 16px 16px', '--border-radius': '8px' }}>
               <IonIcon slot="start" icon={keyOutline} />
               Set PIN

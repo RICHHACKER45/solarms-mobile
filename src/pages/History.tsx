@@ -2,19 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonButton, IonList, IonItem, IonLabel, IonCard, IonBadge } from '@ionic/react';
 import { time, documentTextOutline, trashOutline, warning, checkmarkCircle } from 'ionicons/icons';
 import { StorageService } from '../services/StorageService';
+import { useHardware } from '../contexts/HardwareContext';
 import './Home.css';
 
 const History: React.FC = () => {
+  const { data } = useHardware();
   const [logs, setLogs] = useState<Array<{timestamp: string, voltage: string, current: string, power: string, temp: string}>>([]);
 
   const fetchLogs = async () => {
     const parsedLogs = await StorageService.getParsedLogs();
-    setLogs(parsedLogs);
+    // Reverse the array so the newest logs are at the top
+    setLogs(parsedLogs.reverse());
   };
 
   useEffect(() => {
     fetchLogs();
-  }, []);
+  }, [data]);
 
   const handleClearLogs = async () => {
     await StorageService.clearLogs();

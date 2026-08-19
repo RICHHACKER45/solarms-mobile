@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonButton, IonInput, IonItem, IonLabel, useIonToast } from '@ionic/react';
 import { wifiOutline, hardwareChipOutline, saveOutline } from 'ionicons/icons';
 import { useHardware } from '../contexts/HardwareContext';
@@ -8,6 +8,10 @@ const Connection: React.FC = () => {
   const { ipAddress, setIpAddress } = useHardware();
   const [tempIp, setTempIp] = useState(ipAddress);
   const [presentToast] = useIonToast();
+
+  useEffect(() => {
+    setTempIp(ipAddress);
+  }, [ipAddress]);
 
   const handleSave = () => {
     setIpAddress(tempIp);
@@ -60,7 +64,7 @@ const Connection: React.FC = () => {
               type="text" 
               placeholder="e.g. 192.168.4.1" 
               value={tempIp}
-              onIonChange={(e) => setTempIp(e.detail.value!)}
+              onIonInput={(e: any) => setTempIp(e.target.value)}
               style={{
                 '--background': 'rgba(0,0,0,0.5)',
                 '--color': '#fff',

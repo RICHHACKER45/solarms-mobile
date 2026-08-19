@@ -59,6 +59,7 @@ export const HardwareProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   const setSimulatorEnabled = async (enabled: boolean) => {
     setSimulatorEnabledState(enabled);
+    setData(null); // Clear old data so the dashboard resets!
     await Preferences.set({ key: 'simulator_enabled', value: enabled ? 'true' : 'false' });
   };
 
